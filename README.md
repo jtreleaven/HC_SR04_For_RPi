@@ -7,10 +7,12 @@ the bcm2835 C library that allows access the Raspberry Pi's GPIO pins, internal 
 How to use Macro
 ================
 
-  1) Either turn on and open the terminal on your Pi or ssh into your Pi. Watch the video found here from time 1:30 to
+  1) Either turn on and open the terminal on your Pi or ssh into your Pi. Watch the video found here -> (http://www.youtube.com/watch?v=h89ZL0YWPok) from time 1:30 to
      5:00 for instructions on how to install the bcm2835 library.
      
-      - Here is a link to the library documentation if you'd like to know more about it.
+     Here is a link to the library documentation if you'd like to know more about it.
+          -http://www.airspayce.com/mikem/bcm2835/index.html
+        
       
   2) Next download or copy the HC_SR04.c, HC_SR04.h, and the main.c files above into what ever directory you want
      to use on your raspberry pi.
@@ -25,5 +27,3 @@ How to use Macro
   5) To test this, just type:
   
           sudo ./(File name you choose from above)
-          
-     and hit enter.
