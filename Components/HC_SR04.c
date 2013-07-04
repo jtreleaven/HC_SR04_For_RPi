@@ -1,4 +1,4 @@
-//   HC_SR04.c
+//   HC_SR04.c0
 //
 //   This was designed for use with the HC-SR04 Ultrasonic distance
 //   sensor on the Raspberry Pi. Of all of the resources for the 
@@ -15,8 +15,20 @@
 #include <bcm2835.h>
 #include "HC_SR04.h"
 
-uint64_t cyclePulse(int trigger, int echo)
+/*
+ *  This is a local subroutine function used in each method to 
+ *  initiate pulses out of the sensor and return the pulse with
+ *  of the returned ultrasonic signal.
+ *  Trigger - The GPIO pin attached to the trigger pin on the 
+ *            sensor.
+ *  Echo    - The GPIO pin attached to the echo pin on the
+ *            sensor.
+ */
+static uint64_t cyclePulse(int trigger, int echo)
 {
+        if (!bcm2835_init())
+	        return 1;
+      
 	// Set RPi pin echo to be an input pin
 	bcm2835_gpio_fsel(echo, BCM2835_GPIO_FSEL_INPT);
 	// Set RPi pin P1-11 to be an output pin
@@ -24,7 +36,10 @@ uint64_t cyclePulse(int trigger, int echo)
 	
 	
 	// Declare the unsigned int timer variables to measure pulses
-	uint64_t width, start, end;
+	uint64_t width, begin, start, end;
+	int max = 80, check;
+
+	begin = bcm2835_st_read();
 	
 	// Emit pulse for 10 microseconds
 	bcm2835_gpio_write(trigger, HIGH); // Set trigger state HIGH
@@ -32,12 +47,12 @@ uint64_t cyclePulse(int trigger, int echo)
 	bcm2835_gpio_write(trigger, LOW);  // Set trigger state LOW
 	
 	// Infinite loop until a pulse is recieved
-	while(bcm2835_gpio_lev(echo) == LOW) 
+	while(bcm2835_gpio_lev(echo) == LOW && check < max) 
 	{
+	        start = bcm2835_st_read();
+		check = (int) begin - start;
 	}
-	// Echo pin is HIGH, starting timer at Rising edge of clock
-	start = bcm2835_st_read();
-	
+		
 	// Loop and delay for one microsecond until falling edge detected
 	while(bcm2835_gpio_lev(echo) == HIGH)
 	{
@@ -48,7 +63,11 @@ uint64_t cyclePulse(int trigger, int echo)
 	
 	// Get the final with of the pulse
 	width = end - start;
-	
+
+	//Close the bcm2835 bridge
+	bcm2835_close();
+
+	// Return the total width of the returned pulse
 	return width;
 }
 
@@ -62,10 +81,7 @@ uint64_t cyclePulse(int trigger, int echo)
  */
 int getDistanceInches(int trigger, int echo)
 {
-	uint64_t width = cyclePulse(trigger, echo);
-	
-	int inches = (int) width / 144;
-	return inches;
+        return (int) cyclePulse(trigger, echo) / 144;
 }
 
 /*
@@ -76,10 +92,7 @@ int getDistanceInches(int trigger, int echo)
  */
 int getDistanceCentimeters(int trigger, int echo)
 {
-	uint64_t width = cyclePulse(trigger, echo);
-	
-	int centimeters = (int) width / 56;
-	return centimeters;
+        return (int) cyclePulse(trigger, echo) / 55.5;
 }
 
 
@@ -91,10 +104,7 @@ int getDistanceCentimeters(int trigger, int echo)
  */
 float preciseDistanceInches(int trigger, int echo)
 {
-	uint64_t width = cyclePulse(trigger, echo);
-	
-	float inches = (float) width / 144;
-	return inches;
+        return (float) cyclePulse(trigger, echo) / 144;
 }
 
 
@@ -107,8 +117,5 @@ float preciseDistanceInches(int trigger, int echo)
  */
 float preciseDistanceCentimeters(int trigger, int echo)
 {
-	uint64_t width = cyclePulse(trigger, echo);
-	
-	float centimeters = (float) width / 56;
-	return centimeters;
+        return (float) cyclePulse(trigger, echo) / 55.5;
 }

@@ -13,11 +13,6 @@
 
 int main(int argc, char **argv)
 {
-	if (!bcm2835_init())
-	{
-		return 1;
-	}
-	
 	printf("Testing getDistance for Integers...\n");
 	
 	// Test integer methods
@@ -33,8 +28,6 @@ int main(int argc, char **argv)
 	
 	printf("Inches = %f\n", preInt);
 	printf("Centimeters = %f\n", preCent);
-	
-	bcm2835_close();
 	
 	return 0;
 }
